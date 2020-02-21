@@ -31,13 +31,15 @@ export interface BusinessResponse {
 }
 
 
-export default (): [Function, BusinessResponse[], string] => {
+export default (): [Function, BusinessResponse[], boolean, string] => {
     const [results, setResults] = useState<BusinessResponse[]>([]);
+    const [categories, setCategories] = useState<[]>([]);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     const searchApi = async (term = '') => {
-        console.log('run');
         try {
+            setIsLoading(true);
             const response = await businessService.get('/search', {
                 params: {
                     limit: 30,
@@ -46,13 +48,18 @@ export default (): [Function, BusinessResponse[], string] => {
                 }
             });
             setResults(response.data.businesses);
-            // console.log(response.data.businesses);
+            console.log(response.data.businesses);
+            results.forEach(x => {
+                // TODO: Categories
+            });
+
+
         } catch (error) {
             setErrorMessage(error);
-        }
+        } finally { setIsLoading(false); }
     }
 
     useEffect(() => { searchApi() }, []);
 
-    return [searchApi, results, errorMessage]
+    return [searchApi, results, isLoading, errorMessage]
 }
